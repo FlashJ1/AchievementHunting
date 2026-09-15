@@ -158,11 +158,29 @@ namespace AchievementHunting
                 selectedGame.TotalAchievements = achievements.Count;
                 selectedGame.UnlockedAchievements = achievements.Count(a => a.Achieved);
                 selectedGame.Percent = (int)(selectedGame.UnlockedAchievements * 100.0 / selectedGame.TotalAchievements);
+                if (selectedGame.Percent >= 100)
+                {
+                    if (form3 != null && !form3.IsDisposed)
+                    {
+                        form3.Close();
+                        form3 = null;
+                    }
+                    games.Remove(selectedGame);
+                    selectedGame = null;
+                    lbTitle.Text = "";
+                    imageHeader.Image = null;
+                    btnAchieveList.Enabled = false;
+                    btnLaunchGame.Enabled = false;
+                }
+                else
+                {
+                    lbTitle.Text = $"{selectedGame.Name} - {selectedGame.Percent}%";
+                    if (form3 != null && !form3.IsDisposed) form3.RefreshAchievements();
+                }
+                await ggd.UpdateSteamGamesAsync();
                 randGames = games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements).ToList();
                 bestGame = randGames.OrderByDescending(g => g.Percent).FirstOrDefault();
                 gamesToSave = games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements && g.Achievements.Any(a => !a.Achieved)).Select(g => new Game { Name = g.Name, ID = g.ID, ImgIconUrl = g.ImgIconUrl, HasAchievements = g.HasAchievements, TotalAchievements = g.TotalAchievements, UnlockedAchievements = g.UnlockedAchievements, Percent = g.Percent, ImgIcon = g.ImgIcon, Achievements = g.Achievements.Where(a => !a.Achieved).ToList() }).ToList();
-                lbTitle.Text = $"{selectedGame.Name} - {selectedGame.Percent}%";
-                if (form3 != null && !form3.IsDisposed) form3.RefreshAchievements();
             }
             finally
             {

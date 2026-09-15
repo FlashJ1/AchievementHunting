@@ -44,7 +44,6 @@ namespace AchievementHunting
             SaveData.Save(gamesToSave);
             SaveData.Save(user);
         }
-
         public string GetSteamID()
         {
             if (string.IsNullOrWhiteSpace(steamID))
@@ -54,7 +53,6 @@ namespace AchievementHunting
             }
             return steamID;
         }
-
         public async Task<List<Game>> GetOwnedGamesAsync()
         {
             string steamID = GetSteamID();
@@ -72,7 +70,6 @@ namespace AchievementHunting
             }
             return Games;
         }
-
         public async Task GetPlayerSummariesAsync()
         {
             string steamID = GetSteamID();
@@ -84,7 +81,6 @@ namespace AchievementHunting
             user.Nickname = player.GetProperty("personaname").GetString();
             user.ProfileImageUrl = player.GetProperty("avatarmedium").GetString();
         }
-
         public async Task LoadGameIconsAsync()
         {
             SemaphoreSlim semaphore = new SemaphoreSlim(10);
@@ -109,7 +105,6 @@ namespace AchievementHunting
             });
             await Task.WhenAll(tasks);
         }
-
         public async Task LoadGameAchievementsAsync()
         {
             SemaphoreSlim semaphore = new SemaphoreSlim(10);
@@ -145,7 +140,6 @@ namespace AchievementHunting
             randGames = Games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements).ToList();
             bestGame = randGames.OrderByDescending(g => g.Percent).FirstOrDefault();
         }
-
         public async Task<List<GameAchievement>> LoadAchievementSchemaAsync(string appID)
         {
             string url = $"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={APIKey}&appid={appID}&l=ukrainian";
@@ -182,7 +176,6 @@ namespace AchievementHunting
             }
             return achievements;
         }
-
         public async Task<bool> LoadPlayerAchievementStatusAsync(string appID, List<GameAchievement> achievements)
         {
             string steamID = GetSteamID();
@@ -210,7 +203,6 @@ namespace AchievementHunting
                 return false;
             }
         }
-
         public async Task LoadAchievementDetailsAsync()
         {
             var gamesWithAchievements = Games.Where(g => g.HasAchievements).ToList();
@@ -219,7 +211,6 @@ namespace AchievementHunting
                 await LoadGlobalAchievementPercentagesAsync(game.ID, game.Achievements);
             }
         }
-
         public async Task LoadGlobalAchievementPercentagesAsync(string appID, List<GameAchievement> achievements)
         {
             string url = $"https://api.steampowered.com/ISteamUserStats/GetGlobalAchievementPercentagesForApp/v2/?gameid={appID}";
@@ -242,7 +233,6 @@ namespace AchievementHunting
                 Debug.WriteLine($"Global achievement error for {appID}: {ex.Message}");
             }
         }
-
         public async Task LoadAchievementIconsAsync()
         {
             SemaphoreSlim semaphore = new SemaphoreSlim(10);
@@ -268,6 +258,35 @@ namespace AchievementHunting
                 }
             });
             await Task.WhenAll(tasks);
+        }
+        public async Task UpdateSteamGamesAsync()
+        {
+            List<Game> currGames = new List<Game>();
+            string steamID = GetSteamID();
+            string url = $"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={APIKey}&steamid={steamID}&include_appinfo=true";
+            string json = await _httpClient.GetStringAsync(url);
+            JsonDocument doc = JsonDocument.Parse(json);
+            foreach (JsonElement game in doc.RootElement.GetProperty("response").GetProperty("games").EnumerateArray())
+            {
+                string gameID = game.GetProperty("appid").GetInt32().ToString();
+                if (Games.Any(g => g.ID == gameID)) continue;
+                currGames.Add(new Game
+                {
+                    Name = game.GetProperty("name").GetString(),
+                    ID = gameID,
+                    ImgIconUrl = $"https://media.steampowered.com/steamcommunity/public/images/apps/{game.GetProperty("appid").GetInt32()}/{game.GetProperty("img_icon_url").GetString()}.jpg",
+                });
+            }
+            Games.AddRange(currGames);
+            await LoadGameIconsAsync();
+            if (currGames.Count > 0)
+            {
+                await LoadGameAchievementsAsync();
+                await LoadAchievementDetailsAsync();
+                await LoadAchievementIconsAsync();
+                gamesToSave = Games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements && g.Achievements.Any(a => !a.Achieved)).Select(g => new Game { Name = g.Name, ID = g.ID, ImgIconUrl = g.ImgIconUrl, HasAchievements = g.HasAchievements, TotalAchievements = g.TotalAchievements, UnlockedAchievements = g.UnlockedAchievements, Percent = g.Percent, ImgIcon = g.ImgIcon, Achievements = g.Achievements.Where(a => !a.Achieved).ToList() }).ToList();
+                SaveData.Save(gamesToSave);
+            }
         }
     }
 }
