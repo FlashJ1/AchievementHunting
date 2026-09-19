@@ -83,7 +83,8 @@ namespace AchievementHunting
                 selectedGame = bestGame;
                 imageHeader.ImageLocation = GetHeaderImageUrl(int.Parse(bestGame.ID));
                 btnLaunchGame.Enabled = true;
-                lbTitle.Text = $"{bestGame.Name} - {bestGame.Percent}%";
+                lbTitle.Text = $"{selectedGame.Name} - {selectedGame.UnlockedAchievements}/{selectedGame.TotalAchievements} ({selectedGame.Percent}%)";
+                AutoResizeTitleFont();
                 btnAchieveList.Enabled = true;
             }
         }
@@ -101,7 +102,8 @@ namespace AchievementHunting
             selectedGame = randGame;
             imageHeader.ImageLocation = GetHeaderImageUrl(int.Parse(randGame.ID));
             btnLaunchGame.Enabled = true;
-            lbTitle.Text = $"{randGame.Name} - {randGame.Percent}%";
+            lbTitle.Text = $"{selectedGame.Name} - {selectedGame.UnlockedAchievements}/{selectedGame.TotalAchievements} ({selectedGame.Percent}%)";
+            AutoResizeTitleFont();
             btnAchieveList.Enabled = true;
         }
         private void btnListGames_Click(object sender, EventArgs e)
@@ -121,7 +123,8 @@ namespace AchievementHunting
         {
             selectedGame = game;
             imageHeader.ImageLocation = GetHeaderImageUrl(int.Parse(game.ID));
-            lbTitle.Text = $"{game.Name} - {game.Percent}%";
+            lbTitle.Text = $"{selectedGame.Name} - {selectedGame.UnlockedAchievements}/{selectedGame.TotalAchievements} ({selectedGame.Percent}%)";
+            AutoResizeTitleFont();
             btnLaunchGame.Enabled = true;
             btnAchieveList.Enabled = true;
         }
@@ -174,7 +177,8 @@ namespace AchievementHunting
                 }
                 else
                 {
-                    lbTitle.Text = $"{selectedGame.Name} - {selectedGame.Percent}%";
+                    lbTitle.Text = $"{selectedGame.Name} - {selectedGame.UnlockedAchievements}/{selectedGame.TotalAchievements} ({selectedGame.Percent}%)";
+                    AutoResizeTitleFont();
                     if (form3 != null && !form3.IsDisposed) form3.RefreshAchievements();
                 }
                 await ggd.UpdateSteamGamesAsync();
@@ -237,6 +241,22 @@ namespace AchievementHunting
                 }
             });
             await Task.WhenAll(tasks);
+        }
+        private void AutoResizeTitleFont()
+        {
+            float maxSize = 18f;
+            float minSize = 8f;
+            for (float size = maxSize; size >= minSize; size -= 0.5f)
+            {
+                Font font = new Font(lbTitle.Font.FontFamily, size, lbTitle.Font.Style);
+                Size textSize = TextRenderer.MeasureText(lbTitle.Text, font);
+                if (textSize.Width <= lbTitle.ClientSize.Width)
+                {
+                    lbTitle.Font = font;
+                    return;
+                }
+            }
+            lbTitle.Font = new Font(lbTitle.Font.FontFamily, minSize, lbTitle.Font.Style);
         }
     }
 }
