@@ -1,6 +1,6 @@
 ﻿namespace AchievementHunting
 {
-    partial class Form1
+    partial class MainMenu
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainMenu));
             btnListGames = new Button();
             btnMaxPercentGame = new Button();
             btnRandomGame = new Button();
@@ -80,7 +80,7 @@
             imageHeader.BorderStyle = BorderStyle.FixedSingle;
             imageHeader.Location = new Point(745, 121);
             imageHeader.Name = "imageHeader";
-            imageHeader.Size = new Size(200, 300);
+            imageHeader.Size = new Size(197, 301);
             imageHeader.SizeMode = PictureBoxSizeMode.StretchImage;
             imageHeader.TabIndex = 6;
             imageHeader.TabStop = false;
@@ -88,7 +88,7 @@
             // btnLaunchGame
             // 
             btnLaunchGame.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnLaunchGame.Location = new Point(745, 427);
+            btnLaunchGame.Location = new Point(742, 428);
             btnLaunchGame.Name = "btnLaunchGame";
             btnLaunchGame.Size = new Size(200, 23);
             btnLaunchGame.TabIndex = 7;
@@ -98,7 +98,9 @@
             // 
             // lbTitle
             // 
+            lbTitle.BackColor = Color.Transparent;
             lbTitle.Font = new Font("Segoe UI Semibold", 18F, FontStyle.Bold);
+            lbTitle.ForeColor = Color.White;
             lbTitle.Location = new Point(12, 376);
             lbTitle.Name = "lbTitle";
             lbTitle.Size = new Size(727, 45);
@@ -108,16 +110,20 @@
             // 
             // profileImage
             // 
+            profileImage.BackColor = Color.Transparent;
             profileImage.Location = new Point(12, 12);
             profileImage.Name = "profileImage";
             profileImage.Size = new Size(64, 64);
             profileImage.TabIndex = 10;
             profileImage.TabStop = false;
+            profileImage.Click += profileImage_Click;
             // 
             // lbNickname
             // 
             lbNickname.AutoSize = true;
+            lbNickname.BackColor = Color.Transparent;
             lbNickname.Font = new Font("Segoe UI Semibold", 24F, FontStyle.Bold);
+            lbNickname.ForeColor = Color.White;
             lbNickname.Location = new Point(82, 21);
             lbNickname.Name = "lbNickname";
             lbNickname.Size = new Size(0, 45);
@@ -154,11 +160,12 @@
             btnRefresh.UseVisualStyleBackColor = true;
             btnRefresh.Click += btnRefresh_Click;
             // 
-            // Form1
+            // MainMenu
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(957, 450);
+            BackgroundImage = Properties.Resources.AHBG;
+            ClientSize = new Size(954, 451);
             Controls.Add(btnRefresh);
             Controls.Add(btnAchieveList);
             Controls.Add(lbGamesProgress);
@@ -173,7 +180,7 @@
             FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
             MaximizeBox = false;
-            Name = "Form1";
+            Name = "MainMenu";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Form1";
             Load += Form1_Load;

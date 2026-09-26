@@ -1,6 +1,6 @@
 ﻿namespace AchievementHunting
 {
-    partial class Form4
+    partial class Login
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form4));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Login));
             lbLogin = new Label();
             label1 = new Label();
             tbSteamID = new TextBox();
@@ -84,9 +84,9 @@
             Controls.Add(label1);
             Controls.Add(lbLogin);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Name = "Form4";
-            Text = "Form4";
-            Load += Form4_Load;
+            Name = "Login";
+            Text = "Login";
+            Load += Login_Load;
             ResumeLayout(false);
             PerformLayout();
         }

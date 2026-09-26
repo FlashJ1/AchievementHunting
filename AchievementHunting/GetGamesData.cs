@@ -80,6 +80,7 @@ namespace AchievementHunting
             user.SteamID = player.GetProperty("steamid").GetString();
             user.Nickname = player.GetProperty("personaname").GetString();
             user.ProfileImageUrl = player.GetProperty("avatarmedium").GetString();
+            user.ProfileFullImageUrl = player.GetProperty("avatarfull").GetString();
         }
         public async Task LoadGameIconsAsync()
         {
@@ -192,8 +193,13 @@ namespace AchievementHunting
                 {
                     string apiName = playerAchievement.GetProperty("apiname").GetString() ?? "";
                     int achieved = playerAchievement.GetProperty("achieved").GetInt32();
+                    long unlockTime = playerAchievement.GetProperty("unlocktime").GetInt64();
                     GameAchievement? achievement = achievements.FirstOrDefault(a => a.APIName == apiName);
-                    if (achievement != null) achievement.Achieved = achieved == 1;
+                    if (achievement != null)
+                    {
+                        achievement.Achieved = achieved == 1;
+                        achievement.AchievedAt = DateTimeOffset.FromUnixTimeSeconds(unlockTime).LocalDateTime;
+                    }
                 }
                 return true;
             }
@@ -287,6 +293,36 @@ namespace AchievementHunting
                 gamesToSave = Games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements && g.Achievements.Any(a => !a.Achieved)).Select(g => new Game { Name = g.Name, ID = g.ID, ImgIconUrl = g.ImgIconUrl, HasAchievements = g.HasAchievements, TotalAchievements = g.TotalAchievements, UnlockedAchievements = g.UnlockedAchievements, Percent = g.Percent, ImgIcon = g.ImgIcon, Achievements = g.Achievements.Where(a => !a.Achieved).ToList() }).ToList();
                 SaveData.Save(gamesToSave);
             }
+        }
+        public async Task GetGamesDataFromSteamWithoutSaving()
+        {
+            Games.Clear();
+            await GetOwnedGamesAsync();
+            await Task.WhenAll(LoadGameIconsAsync(), LoadGameAchievementsAsync());
+            LoadBeatenGames();
+        }
+        public void LoadBeatenGames()
+        {
+            List<BeatenGame> beatenGames = SaveData.LoadBeatenGames();
+            foreach (Game game in Games)
+            {
+                if (!game.HasAchievements) continue;
+                if (game.UnlockedAchievements < game.TotalAchievements) continue;
+                if (game.BeatedAt.HasValue) continue;
+                GameAchievement? lastAchievement = game.Achievements.Where(a => a.Achieved && a.AchievedAt.HasValue).OrderByDescending(a => a.AchievedAt).FirstOrDefault();
+                if (!lastAchievement?.AchievedAt.HasValue ?? true) continue;
+                game.BeatedAt = lastAchievement.AchievedAt;
+                if (!beatenGames.Any(g => g.ID == game.ID))
+                {
+                    beatenGames.Add(new BeatenGame
+                    {
+                        ID = game.ID,
+                        BeatedAt = game.BeatedAt
+                    });
+                }
+            }
+
+            SaveData.Save(beatenGames);
         }
     }
 }

@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace AchievementHunting
 {
-    public partial class Form1 : Form
+    public partial class MainMenu : Form
     {
         private readonly Random random = new Random();
         private readonly HttpClient _httpClient = new HttpClient();
@@ -19,11 +19,12 @@ namespace AchievementHunting
         Game? bestGame = null;
         Game? randGame = null;
         Game? selectedGame = null;
-        private Form2? form2;
-        private Form3? form3;
+        private ListGame? form2;
+        private AchieveList? form3;
+        private Profile? form4;
         private readonly GetGamesData? ggd;
 
-        public Form1()
+        public MainMenu()
         {
             InitializeComponent();
             user = SaveData.LoadUser();
@@ -31,7 +32,7 @@ namespace AchievementHunting
             if (!string.IsNullOrWhiteSpace(user.SteamID)) ggd = new GetGamesData(user.SteamID);
         }
 
-        public Form1(GetGamesData ggd)
+        public MainMenu(GetGamesData ggd)
         {
             InitializeComponent();
             this.ggd = ggd;
@@ -53,18 +54,16 @@ namespace AchievementHunting
             btnMaxPercentGame.Enabled = false;
             btnRandomGame.Enabled = false;
             btnLaunchGame.Enabled = false;
+            btnLaunchGame.Visible = false;
             btnAchieveList.Enabled = false;
+            btnAchieveList.Visible = false;
+            btnRefresh.Enabled = false;
+            profileImage.Enabled = false;
+            imageHeader.Visible = false;
             games = SaveData.Load();
             if (games.Count > 0)
             {
-                if (ggd != null)
-                {
-                    ggd.Games.Clear();
-                    ggd.Games.AddRange(games);
-
-                    await ggd.LoadGameIconsAsync();
-                    await ggd.LoadAchievementIconsAsync();
-                }
+                if (ggd != null) _ = ggd.GetGamesDataFromSteamWithoutSaving();
                 await LoadGameIconsAsync();
                 await LoadAchievementIconsAsync();
                 randGames = games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements).ToList();
@@ -72,6 +71,8 @@ namespace AchievementHunting
                 btnListGames.Enabled = true;
                 btnMaxPercentGame.Enabled = true;
                 btnRandomGame.Enabled = true;
+                btnRefresh.Enabled = true;
+                profileImage.Enabled = true;
             }
             profileImage.ImageLocation = user.ProfileImageUrl;
             lbNickname.Text = user.Nickname;
@@ -80,6 +81,12 @@ namespace AchievementHunting
         {
             if (bestGame != null)
             {
+                if (imageHeader.Visible == false)
+                {
+                    imageHeader.Visible = true;
+                    btnLaunchGame.Visible = true;
+                    btnAchieveList.Visible = true;
+                }
                 selectedGame = bestGame;
                 imageHeader.ImageLocation = GetHeaderImageUrl(int.Parse(bestGame.ID));
                 btnLaunchGame.Enabled = true;
@@ -98,6 +105,12 @@ namespace AchievementHunting
         }
         private void btnRandomGame_Click(object sender, EventArgs e)
         {
+            if (imageHeader.Visible == false)
+            {
+                imageHeader.Visible = true;
+                btnLaunchGame.Visible = true;
+                btnAchieveList.Visible = true;
+            }
             randGame = randGames[random.Next(randGames.Count)];
             selectedGame = randGame;
             imageHeader.ImageLocation = GetHeaderImageUrl(int.Parse(randGame.ID));
@@ -114,13 +127,19 @@ namespace AchievementHunting
                 return;
             }
             var sortedGames = games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements).OrderByDescending(g => g.Percent).ToList();
-            form2 = new Form2(sortedGames);
+            form2 = new ListGame(sortedGames);
             form2.FormClosed += (s, args) => form2 = null;
             form2.GameSelected += OnGameSelected;
             form2.Show();
         }
         private void OnGameSelected(Game game)
         {
+            if (imageHeader.Visible == false)
+            {
+                imageHeader.Visible = true;
+                btnLaunchGame.Visible = true;
+                btnAchieveList.Visible = true;
+            }
             selectedGame = game;
             imageHeader.ImageLocation = GetHeaderImageUrl(int.Parse(game.ID));
             lbTitle.Text = $"{selectedGame.Name} - {selectedGame.UnlockedAchievements}/{selectedGame.TotalAchievements} ({selectedGame.Percent}%)";
@@ -133,10 +152,11 @@ namespace AchievementHunting
             if (selectedGame == null) return;
             if (form3 != null && !form3.IsDisposed)
             {
+                form3.UpdateGame(selectedGame);
                 form3.BringToFront();
                 return;
             }
-            form3 = new Form3(selectedGame);
+            form3 = new AchieveList(selectedGame);
             form3.FormClosed += (s, args) => form3 = null;
             form3.Show();
         }
@@ -163,6 +183,20 @@ namespace AchievementHunting
                 selectedGame.Percent = (int)(selectedGame.UnlockedAchievements * 100.0 / selectedGame.TotalAchievements);
                 if (selectedGame.Percent >= 100)
                 {
+                    var lastAchievement = selectedGame.Achievements.Where(a => a.Achieved && a.AchievedAt.HasValue).OrderByDescending(a => a.AchievedAt).FirstOrDefault();
+                    selectedGame.BeatedAt = lastAchievement?.AchievedAt;
+                    List<BeatenGame> beatenGames = SaveData.LoadBeatenGames();
+                    BeatenGame? existing = beatenGames.FirstOrDefault(g => g.ID == selectedGame.ID);
+                    if (existing == null)
+                    {
+                        beatenGames.Add(new BeatenGame
+                        {
+                            ID = selectedGame.ID,
+                            BeatedAt = selectedGame.BeatedAt
+                        });
+                    }
+                    else existing.BeatedAt = selectedGame.BeatedAt;
+                    SaveData.Save(beatenGames);
                     if (form3 != null && !form3.IsDisposed)
                     {
                         form3.Close();
@@ -181,10 +215,10 @@ namespace AchievementHunting
                     AutoResizeTitleFont();
                     if (form3 != null && !form3.IsDisposed) form3.RefreshAchievements();
                 }
-                await ggd.UpdateSteamGamesAsync();
                 randGames = games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements).ToList();
                 bestGame = randGames.OrderByDescending(g => g.Percent).FirstOrDefault();
                 gamesToSave = games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements && g.Achievements.Any(a => !a.Achieved)).Select(g => new Game { Name = g.Name, ID = g.ID, ImgIconUrl = g.ImgIconUrl, HasAchievements = g.HasAchievements, TotalAchievements = g.TotalAchievements, UnlockedAchievements = g.UnlockedAchievements, Percent = g.Percent, ImgIcon = g.ImgIcon, Achievements = g.Achievements.Where(a => !a.Achieved).ToList() }).ToList();
+                await ggd.UpdateSteamGamesAsync();
             }
             finally
             {
@@ -257,6 +291,19 @@ namespace AchievementHunting
                 }
             }
             lbTitle.Font = new Font(lbTitle.Font.FontFamily, minSize, lbTitle.Font.Style);
+        }
+
+        private void profileImage_Click(object sender, EventArgs e)
+        {
+            if (form4 != null && !form4.IsDisposed)
+            {
+                form4.BringToFront();
+                return;
+            }
+            var gamesToPass = (ggd != null && ggd.Games.Count > 0) ? ggd.Games : games;
+            form4 = new Profile(gamesToPass);
+            form4.FormClosed += (s, args) => form4 = null;
+            form4.Show();
         }
     }
 }

@@ -16,14 +16,14 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace AchievementHunting
 {
-    public partial class Form4 : Form
+    public partial class Login : Form
     {
         public string SteamID => tbSteamID.Text.Trim();
         private GetGamesData ggd;
         private List<Game> games = new List<Game>();
 
-        private Form1? form1;
-        public Form4()
+        private MainMenu? form1;
+        public Login()
         {
             InitializeComponent();
         }
@@ -32,13 +32,13 @@ namespace AchievementHunting
         {
             ggd = new GetGamesData(SteamID);
             await ggd.GetGamesDataFromSteam();
-            form1 = new Form1(ggd);
+            form1 = new MainMenu(ggd);
             form1.FormClosed += (s, args) => form1 = null;
             form1.Show();
             this.Hide();
         }
 
-        private void Form4_Load(object sender, EventArgs e)
+        private void Login_Load(object sender, EventArgs e)
         {
             this.Text = "Achievement Hunting - Login";
         }

@@ -19,6 +19,7 @@ namespace AchievementHunting.Models
         [JsonIgnore]
         public Image? ImgIcon { get; set; }
         public List<GameAchievement> Achievements { get; set; }
+        public DateTime? BeatedAt { get; set; }
 
     }
 }

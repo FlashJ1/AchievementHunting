@@ -1,6 +1,6 @@
 ﻿namespace AchievementHunting
 {
-    partial class Form2
+    partial class ListGame
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form2));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListGame));
             listBoxGames = new ListView();
             Game = new ColumnHeader();
             Percent = new ColumnHeader();

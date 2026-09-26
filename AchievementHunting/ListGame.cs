@@ -12,12 +12,12 @@ using System.Windows.Forms;
 namespace AchievementHunting
 {
 
-    public partial class Form2 : Form
+    public partial class ListGame : Form
     {
         private readonly List<Game> games;
         private readonly HttpClient httpClient = new HttpClient();
         public event Action<Game>? GameSelected;
-        public Form2(List<Game> games)
+        public ListGame(List<Game> games)
         {
             InitializeComponent();
 

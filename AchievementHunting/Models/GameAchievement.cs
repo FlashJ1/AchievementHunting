@@ -18,6 +18,7 @@ namespace AchievementHunting.Models
         [JsonIgnore]
         public Image Icon { get; set; }
         public bool Achieved { get; set; }
+        public DateTime? AchievedAt { get; set; }
         public bool Hidden { get; set; }
     }
 }

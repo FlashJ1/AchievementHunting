@@ -1,6 +1,6 @@
 ﻿namespace AchievementHunting
 {
-    partial class Form3
+    partial class AchieveList
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form3));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AchieveList));
             imageList1 = new ImageList(components);
             listViewAchievements = new ListView();
             Name = new ColumnHeader();
@@ -79,7 +79,7 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             //Name = "Form3";
             Text = "Form3";
-            Load += Form3_Load;
+            Load += AchieveList_Load;
             ResumeLayout(false);
         }
 

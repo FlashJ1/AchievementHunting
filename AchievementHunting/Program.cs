@@ -16,8 +16,8 @@ namespace AchievementHunting
 
         public static void Login()
         {
-            if (SaveData.IsJSONNull()) Application.Run(new Form4());
-            else Application.Run(new Form1());
+            if (SaveData.IsJSONNull()) Application.Run(new Login());
+            else Application.Run(new MainMenu());
         }
     }
 }

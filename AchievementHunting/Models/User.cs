@@ -11,5 +11,6 @@ namespace AchievementHunting.Models
         public string SteamID { get; set; }
         public string Nickname { get; set; }
         public string ProfileImageUrl { get; set; }
+        public string ProfileFullImageUrl { get; set; }
     }
 }

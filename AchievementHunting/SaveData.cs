@@ -21,6 +21,15 @@ namespace AchievementHunting
             string json = JsonSerializer.Serialize(games, options);
             File.WriteAllText(FilePath, json);
         }
+        public static void Save(List<BeatenGame> games)
+        {
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            string json = JsonSerializer.Serialize(games, options);
+            File.WriteAllText("beaten_games.json", json);
+        }
 
         public static void Save(User user)
         {
@@ -37,6 +46,12 @@ namespace AchievementHunting
             if (!File.Exists(FilePath)) return new List<Game>();
             string json = File.ReadAllText(FilePath);
             return JsonSerializer.Deserialize<List<Game>>(json) ?? new List<Game>();
+        }
+        public static List<BeatenGame> LoadBeatenGames()
+        {
+            if (!File.Exists("beaten_games.json")) return new List<BeatenGame>();
+            string json = File.ReadAllText("beaten_games.json");
+            return JsonSerializer.Deserialize<List<BeatenGame>>(json) ?? new List<BeatenGame>();
         }
 
         public static User LoadUser()

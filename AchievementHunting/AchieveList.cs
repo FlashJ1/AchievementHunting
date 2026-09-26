@@ -11,11 +11,11 @@ using System.Windows.Forms;
 
 namespace AchievementHunting
 {
-    public partial class Form3 : Form
+    public partial class AchieveList : Form
     {
-        private readonly Game game;
+        private Game game;
         private readonly HttpClient _httpClient = new HttpClient();
-        public Form3(Game game)
+        public AchieveList(Game game)
         {
             InitializeComponent();
             this.game = game;
@@ -39,8 +39,16 @@ namespace AchievementHunting
             }
 
         }
+        public void UpdateGame(Game newGame)
+        {
+            game = newGame;
+            Text = $"{game.Name} - Achievements";
+            RefreshAchievements();
+            listViewAchievements.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+            listViewAchievements.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
+        }
 
-        private async void Form3_Load(object sender, EventArgs e)
+        private async void AchieveList_Load(object sender, EventArgs e)
         {
             Text = $"{game.Name} - Achievements";
             imageList1.ImageSize = new Size(64, 64);
