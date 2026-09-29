@@ -143,7 +143,7 @@ namespace AchievementHunting
         }
         public async Task<List<GameAchievement>> LoadAchievementSchemaAsync(string appID)
         {
-            string url = $"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={APIKey}&appid={appID}&l=ukrainian";
+            string url = $"https://api.steampowered.com/ISteamUserStats/GetSchemaForGame/v2/?key={APIKey}&appid={appID}";
             List<GameAchievement> achievements = new List<GameAchievement>();
             try
             {

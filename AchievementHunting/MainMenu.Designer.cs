@@ -48,9 +48,9 @@
             // 
             btnListGames.Location = new Point(12, 92);
             btnListGames.Name = "btnListGames";
-            btnListGames.Size = new Size(247, 23);
+            btnListGames.Size = new Size(75, 23);
             btnListGames.TabIndex = 3;
-            btnListGames.Text = "Список ігр з нездобутими досягненнями";
+            btnListGames.Text = "List Games";
             btnListGames.UseVisualStyleBackColor = true;
             btnListGames.Click += btnListGames_Click;
             // 
@@ -58,9 +58,9 @@
             // 
             btnMaxPercentGame.Location = new Point(12, 121);
             btnMaxPercentGame.Name = "btnMaxPercentGame";
-            btnMaxPercentGame.Size = new Size(299, 23);
+            btnMaxPercentGame.Size = new Size(169, 23);
             btnMaxPercentGame.TabIndex = 4;
-            btnMaxPercentGame.Text = "Максимальний відсоток досягнень до Perfect Game";
+            btnMaxPercentGame.Text = "Max Percent to Perfect Game";
             btnMaxPercentGame.UseVisualStyleBackColor = true;
             btnMaxPercentGame.Click += btnMaxPercentGame_Click;
             // 
@@ -70,7 +70,7 @@
             btnRandomGame.Name = "btnRandomGame";
             btnRandomGame.Size = new Size(75, 23);
             btnRandomGame.TabIndex = 5;
-            btnRandomGame.Text = "Рандом";
+            btnRandomGame.Text = "Random";
             btnRandomGame.UseVisualStyleBackColor = true;
             btnRandomGame.Click += btnRandomGame_Click;
             // 
@@ -92,7 +92,7 @@
             btnLaunchGame.Name = "btnLaunchGame";
             btnLaunchGame.Size = new Size(200, 23);
             btnLaunchGame.TabIndex = 7;
-            btnLaunchGame.Text = "Запустити гру";
+            btnLaunchGame.Text = "Launch Game";
             btnLaunchGame.UseVisualStyleBackColor = true;
             btnLaunchGame.Click += btnLaunchGame_Click;
             // 
@@ -146,7 +146,7 @@
             btnAchieveList.Name = "btnAchieveList";
             btnAchieveList.Size = new Size(200, 23);
             btnAchieveList.TabIndex = 14;
-            btnAchieveList.Text = "Нездобуті досягнення";
+            btnAchieveList.Text = "Locked Achievements";
             btnAchieveList.UseVisualStyleBackColor = true;
             btnAchieveList.Click += btnAchieveList_Click;
             // 
