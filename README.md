@@ -3,7 +3,7 @@
 This is my favorite project of all time. This app was created as assistent during Steam Achieve Hunting. There are some features it's like Game List, Max Percent Game and Random Game.
 
 ## List Games
-In List game has detailed description about the game (Percent and Achievements). Also when you selected game by List Games, you can see unachieved achieves by pressing the unachieved achieve button and launch the game by Launch button. When you achieve this one press Refresh button to refresh your stats.
+In List game has detailed description about the game (Percent and Achievements). Also when you selected game by List Games, you can see all locked achieves by pressing the Locked Achievements button and launch the game by Launch button. When you achieve this one press Refresh button to refresh your stats. This button remove already unlocked achieves and if you beat the game to Perfect Game then this game remove from the list too.
 
 <img width="769" height="218" alt="Screenshot 2026-09-26 223100" src="https://github.com/user-attachments/assets/44b8a9c8-a8d2-402c-8519-d3c276d3701f" />
 
