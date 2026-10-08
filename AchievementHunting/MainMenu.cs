@@ -185,7 +185,6 @@ namespace AchievementHunting
                 {
                     var lastAchievement = selectedGame.Achievements.Where(a => a.Achieved && a.AchievedAt.HasValue).OrderByDescending(a => a.AchievedAt).FirstOrDefault();
                     selectedGame.BeatedAt = lastAchievement?.AchievedAt;
-
                     List<BeatenGame> beatenGames = SaveData.LoadBeatenGames();
                     BeatenGame? existing = beatenGames.FirstOrDefault(g => g.ID == selectedGame.ID);
                     if (existing == null)
