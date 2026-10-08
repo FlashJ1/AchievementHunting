@@ -28,10 +28,13 @@ namespace AchievementHunting
         {
             bigProfileImage.ImageLocation = user.ProfileFullImageUrl;
             lbNickname.Text = user.Nickname;
+            RefreshProfile();
+        }
+        public void RefreshProfile()
+        {
             int totalGames = games.Count(g => g.HasAchievements);
             int unlockedGames = games.Count(g => g.HasAchievements && g.UnlockedAchievements >= g.TotalAchievements);
-            lbTotalGames.Text = $"Total Games: {totalGames}";
-            lbUnlockedGames.Text = $"Beaten Games: {unlockedGames}/{totalGames}";
+            lbCountGames.Text = $"Beaten/Total Games: {unlockedGames}/{totalGames}";
             Game? lastBeatenGame = games.Where(g => g.HasAchievements && g.UnlockedAchievements >= g.TotalAchievements && g.BeatedAt.HasValue).OrderByDescending(g => g.BeatedAt).FirstOrDefault();
             if (lastBeatenGame != null)
             {

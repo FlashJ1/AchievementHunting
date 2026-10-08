@@ -31,8 +31,7 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Profile));
             bigProfileImage = new PictureBox();
             lbNickname = new Label();
-            lbTotalGames = new Label();
-            lbUnlockedGames = new Label();
+            lbCountGames = new Label();
             LBGImage = new PictureBox();
             lbLastBeatenGame = new Label();
             ((System.ComponentModel.ISupportInitialize)bigProfileImage).BeginInit();
@@ -58,25 +57,15 @@
             lbNickname.TabIndex = 1;
             lbNickname.Text = "nickname";
             // 
-            // lbTotalGames
+            // lbCountGames
             // 
-            lbTotalGames.AutoSize = true;
-            lbTotalGames.Font = new Font("Segoe UI Semibold", 16F, FontStyle.Bold);
-            lbTotalGames.Location = new Point(146, 77);
-            lbTotalGames.Name = "lbTotalGames";
-            lbTotalGames.Size = new Size(125, 30);
-            lbTotalGames.TabIndex = 2;
-            lbTotalGames.Text = "totalGames";
-            // 
-            // lbUnlockedGames
-            // 
-            lbUnlockedGames.AutoSize = true;
-            lbUnlockedGames.Font = new Font("Segoe UI Semibold", 16F, FontStyle.Bold);
-            lbUnlockedGames.Location = new Point(146, 110);
-            lbUnlockedGames.Name = "lbUnlockedGames";
-            lbUnlockedGames.Size = new Size(173, 30);
-            lbUnlockedGames.TabIndex = 3;
-            lbUnlockedGames.Text = "UnlockedGames";
+            lbCountGames.AutoSize = true;
+            lbCountGames.Font = new Font("Segoe UI Semibold", 16F, FontStyle.Bold);
+            lbCountGames.Location = new Point(146, 77);
+            lbCountGames.Name = "lbCountGames";
+            lbCountGames.Size = new Size(136, 30);
+            lbCountGames.TabIndex = 2;
+            lbCountGames.Text = "countGames";
             // 
             // LBGImage
             // 
@@ -103,8 +92,7 @@
             ClientSize = new Size(800, 450);
             Controls.Add(lbLastBeatenGame);
             Controls.Add(LBGImage);
-            Controls.Add(lbUnlockedGames);
-            Controls.Add(lbTotalGames);
+            Controls.Add(lbCountGames);
             Controls.Add(lbNickname);
             Controls.Add(bigProfileImage);
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -121,8 +109,7 @@
 
         private PictureBox bigProfileImage;
         private Label lbNickname;
-        private Label lbTotalGames;
-        private Label lbUnlockedGames;
+        private Label lbCountGames;
         private PictureBox LBGImage;
         private Label lbLastBeatenGame;
     }

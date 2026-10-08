@@ -185,6 +185,7 @@ namespace AchievementHunting
                 {
                     var lastAchievement = selectedGame.Achievements.Where(a => a.Achieved && a.AchievedAt.HasValue).OrderByDescending(a => a.AchievedAt).FirstOrDefault();
                     selectedGame.BeatedAt = lastAchievement?.AchievedAt;
+
                     List<BeatenGame> beatenGames = SaveData.LoadBeatenGames();
                     BeatenGame? existing = beatenGames.FirstOrDefault(g => g.ID == selectedGame.ID);
                     if (existing == null)
@@ -197,11 +198,24 @@ namespace AchievementHunting
                     }
                     else existing.BeatedAt = selectedGame.BeatedAt;
                     SaveData.Save(beatenGames);
+                    if (ggd != null)
+                    {
+                        var gameInGgd = ggd.Games.FirstOrDefault(g => g.ID == selectedGame.ID);
+                        if (gameInGgd != null)
+                        {
+                            gameInGgd.BeatedAt = selectedGame.BeatedAt;
+                            gameInGgd.Percent = selectedGame.Percent;
+                            gameInGgd.UnlockedAchievements = selectedGame.UnlockedAchievements;
+                            gameInGgd.TotalAchievements = selectedGame.TotalAchievements;
+                            gameInGgd.Achievements = selectedGame.Achievements;
+                        }
+                    }
                     if (form3 != null && !form3.IsDisposed)
                     {
                         form3.Close();
                         form3 = null;
                     }
+                    if (form4 != null && !form4.IsDisposed) form4.RefreshProfile();
                     games.Remove(selectedGame);
                     selectedGame = null;
                     lbTitle.Text = "";

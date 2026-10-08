@@ -30,6 +30,7 @@ namespace AchievementHunting
 
         private async void btLogin_Click(object sender, EventArgs e)
         {
+            btLogin.Enabled = false;
             ggd = new GetGamesData(SteamID);
             await ggd.GetGamesDataFromSteam();
             form1 = new MainMenu(ggd);
