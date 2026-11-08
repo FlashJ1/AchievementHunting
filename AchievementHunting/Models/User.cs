@@ -12,5 +12,11 @@ namespace AchievementHunting.Models
         public string Nickname { get; set; }
         public string ProfileImageUrl { get; set; }
         public string ProfileFullImageUrl { get; set; }
+        public List<Friend> Friends { get; set; }
+    }
+
+    public class Friend : User
+    {
+
     }
 }

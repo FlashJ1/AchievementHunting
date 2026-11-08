@@ -43,27 +43,31 @@ namespace AchievementHunting
 
         public static List<Game> Load()
         {
-            if (!File.Exists(FilePath)) return new List<Game>();
+            if (!File.Exists(FilePath))
+                return new List<Game>();
             string json = File.ReadAllText(FilePath);
             return JsonSerializer.Deserialize<List<Game>>(json) ?? new List<Game>();
         }
         public static List<BeatenGame> LoadBeatenGames()
         {
-            if (!File.Exists("beaten_games.json")) return new List<BeatenGame>();
+            if (!File.Exists("beaten_games.json"))
+                return new List<BeatenGame>();
             string json = File.ReadAllText("beaten_games.json");
             return JsonSerializer.Deserialize<List<BeatenGame>>(json) ?? new List<BeatenGame>();
         }
 
         public static User LoadUser()
         {
-            if (!File.Exists(PlayerFilePath)) return new User();
+            if (!File.Exists(PlayerFilePath))
+                return new User();
             string json = File.ReadAllText(PlayerFilePath);
             return JsonSerializer.Deserialize<User>(json) ?? new User();
         }
 
         public static bool IsJSONNull()
         {
-            if (!File.Exists(FilePath)) return true;
+            if (!File.Exists(FilePath))
+                return true;
             string json = File.ReadAllText(FilePath);
             return string.IsNullOrWhiteSpace(json);
         }

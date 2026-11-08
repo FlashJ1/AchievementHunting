@@ -16,7 +16,9 @@ namespace AchievementHunting
         public List<Game> Games { get; private set; } = new List<Game>();
         List<Game> randGames = new List<Game>();
         List<Game> gamesToSave = new List<Game>();
+        public List<Friend> Friends = new List<Friend>();
         User user = new User();
+        public User Player => user;
         Game? bestGame = null;
         Game? randGame = null;
         Game? selectedGame = null;
@@ -40,7 +42,19 @@ namespace AchievementHunting
             await Task.WhenAll(LoadGameIconsAsync(), LoadGameAchievementsAsync());
             await LoadAchievementDetailsAsync();
             await LoadAchievementIconsAsync();
-            gamesToSave = Games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements && g.Achievements.Any(a => !a.Achieved)).Select(g => new Game { Name = g.Name, ID = g.ID, ImgIconUrl = g.ImgIconUrl, HasAchievements = g.HasAchievements, TotalAchievements = g.TotalAchievements, UnlockedAchievements = g.UnlockedAchievements, Percent = g.Percent, ImgIcon = g.ImgIcon, Achievements = g.Achievements.Where(a => !a.Achieved).ToList() }).ToList();
+            await GetFriendListAsync();
+            gamesToSave = Games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements && g.Achievements.Any(a => !a.Achieved)).Select(g => new Game()
+            {
+                Name = g.Name,
+                ID = g.ID,
+                ImgIconUrl = g.ImgIconUrl,
+                HasAchievements = g.HasAchievements,
+                TotalAchievements = g.TotalAchievements,
+                UnlockedAchievements = g.UnlockedAchievements,
+                Percent = g.Percent,
+                ImgIcon = g.ImgIcon,
+                Achievements = g.Achievements.Where(a => !a.Achieved).ToList()
+            }).ToList();
             SaveData.Save(gamesToSave);
             SaveData.Save(user);
         }
@@ -82,10 +96,32 @@ namespace AchievementHunting
             user.ProfileImageUrl = player.GetProperty("avatarmedium").GetString();
             user.ProfileFullImageUrl = player.GetProperty("avatarfull").GetString();
         }
-        public async Task LoadGameIconsAsync()
+        public async Task GetFriendListAsync()
+        {
+            string steamID = GetSteamID();
+            string url = $"https://api.steampowered.com/ISteamUser/GetFriendList/v1/?key={APIKey}&steamid={steamID}&relationship=friend";
+            string json = await _httpClient.GetStringAsync(url);
+            JsonDocument doc = JsonDocument.Parse(json);
+            foreach (JsonElement friend in doc.RootElement.GetProperty("friendslist").GetProperty("friends").EnumerateArray())
+            {
+                string friendSteamID = friend.GetProperty("steamid").GetString();
+                string friendUrl = $"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key={APIKey}&steamids={friendSteamID}";
+                string friendJson = await _httpClient.GetStringAsync(friendUrl);
+                JsonDocument friendDoc = JsonDocument.Parse(friendJson);
+                JsonElement player = friendDoc.RootElement.GetProperty("response").GetProperty("players")[0];
+                Friends.Add(new Friend
+                {
+                    SteamID = player.GetProperty("steamid").GetString(),
+                    Nickname = player.GetProperty("personaname").GetString(),
+                    ProfileImageUrl = player.GetProperty("avatarmedium").GetString(),
+                    ProfileFullImageUrl = player.GetProperty("avatarfull").GetString()
+                });
+            }
+        }
+        public async Task LoadGameIconsAsync(IEnumerable<Game>? target = null)
         {
             SemaphoreSlim semaphore = new SemaphoreSlim(10);
-            var tasks = Games.Select(async game =>
+            var tasks = (target ?? Games).ToList().Select(async game =>
             {
                 await semaphore.WaitAsync();
                 try
@@ -106,10 +142,10 @@ namespace AchievementHunting
             });
             await Task.WhenAll(tasks);
         }
-        public async Task LoadGameAchievementsAsync()
+        public async Task LoadGameAchievementsAsync(IEnumerable<Game>? target = null)
         {
             SemaphoreSlim semaphore = new SemaphoreSlim(10);
-            var tasks = Games.Select(async game =>
+            var tasks = (target ?? Games).ToList().Select(async game =>
             {
                 await semaphore.WaitAsync();
                 try
@@ -149,9 +185,12 @@ namespace AchievementHunting
             {
                 string json = await _httpClient.GetStringAsync(url);
                 using JsonDocument doc = JsonDocument.Parse(json);
-                if (!doc.RootElement.TryGetProperty("game", out JsonElement game)) return achievements;
-                if (!game.TryGetProperty("availableGameStats", out JsonElement stats)) return achievements;
-                if (!stats.TryGetProperty("achievements", out JsonElement schemaAchievements)) return achievements;
+                if (!doc.RootElement.TryGetProperty("game", out JsonElement game))
+                    return achievements;
+                if (!game.TryGetProperty("availableGameStats", out JsonElement stats))
+                    return achievements;
+                if (!stats.TryGetProperty("achievements", out JsonElement schemaAchievements))
+                    return achievements;
                 foreach (JsonElement schema in schemaAchievements.EnumerateArray())
                 {
                     string apiName = schema.TryGetProperty("name", out JsonElement nameElement) ? nameElement.GetString() ?? "" : "";
@@ -185,10 +224,14 @@ namespace AchievementHunting
             {
                 string json = await _httpClient.GetStringAsync(url);
                 using JsonDocument doc = JsonDocument.Parse(json);
-                if (!doc.RootElement.TryGetProperty("playerstats", out JsonElement playerStats)) return false;
-                if (!playerStats.TryGetProperty("success", out JsonElement successElement)) return false;
-                if (!successElement.GetBoolean()) return false;
-                if (!playerStats.TryGetProperty("achievements", out JsonElement playerAchievements)) return false;
+                if (!doc.RootElement.TryGetProperty("playerstats", out JsonElement playerStats))
+                    return false;
+                if (!playerStats.TryGetProperty("success", out JsonElement successElement))
+                    return false;
+                if (!successElement.GetBoolean())
+                    return false;
+                if (!playerStats.TryGetProperty("achievements", out JsonElement playerAchievements))
+                    return false;
                 foreach (JsonElement playerAchievement in playerAchievements.EnumerateArray())
                 {
                     string apiName = playerAchievement.GetProperty("apiname").GetString() ?? "";
@@ -209,9 +252,9 @@ namespace AchievementHunting
                 return false;
             }
         }
-        public async Task LoadAchievementDetailsAsync()
+        public async Task LoadAchievementDetailsAsync(IEnumerable<Game>? target = null)
         {
-            var gamesWithAchievements = Games.Where(g => g.HasAchievements).ToList();
+            var gamesWithAchievements = (target ?? Games).Where(g => g.HasAchievements).ToList();
             foreach (Game game in gamesWithAchievements)
             {
                 await LoadGlobalAchievementPercentagesAsync(game.ID, game.Achievements);
@@ -224,14 +267,17 @@ namespace AchievementHunting
             {
                 string json = await _httpClient.GetStringAsync(url);
                 using JsonDocument doc = JsonDocument.Parse(json);
-                if (!doc.RootElement.TryGetProperty("achievementpercentages", out JsonElement percentages)) return;
-                if (!percentages.TryGetProperty("achievements", out JsonElement globalAchievements)) return;
+                if (!doc.RootElement.TryGetProperty("achievementpercentages", out JsonElement percentages))
+                    return;
+                if (!percentages.TryGetProperty("achievements", out JsonElement globalAchievements))
+                    return;
                 foreach (JsonElement global in globalAchievements.EnumerateArray())
                 {
                     string apiName = global.GetProperty("name").GetString() ?? "";
                     string percent = global.GetProperty("percent").GetString() ?? "";
                     GameAchievement? achievement = achievements.FirstOrDefault(a => a.APIName == apiName);
-                    if (achievement != null) achievement.GlobalPercent = percent;
+                    if (achievement != null)
+                        achievement.GlobalPercent = percent;
                 }
             }
             catch (Exception ex)
@@ -239,10 +285,10 @@ namespace AchievementHunting
                 Debug.WriteLine($"Global achievement error for {appID}: {ex.Message}");
             }
         }
-        public async Task LoadAchievementIconsAsync()
+        public async Task LoadAchievementIconsAsync(IEnumerable<Game>? target = null)
         {
             SemaphoreSlim semaphore = new SemaphoreSlim(10);
-            var achievements = Games.Where(g => g.HasAchievements).SelectMany(g => g.Achievements);
+            var achievements = (target ?? Games).Where(g => g.HasAchievements).SelectMany(g => g.Achievements).ToList();
             var tasks = achievements.Select(async achievement =>
             {
                 await semaphore.WaitAsync();
@@ -265,34 +311,37 @@ namespace AchievementHunting
             });
             await Task.WhenAll(tasks);
         }
-        public async Task UpdateSteamGamesAsync()
+        public async Task<List<Game>> UpdateSteamGamesAsync()
         {
-            List<Game> currGames = new List<Game>();
+            List<Game> newGames = new List<Game>();
             string steamID = GetSteamID();
             string url = $"https://api.steampowered.com/IPlayerService/GetOwnedGames/v1/?key={APIKey}&steamid={steamID}&include_appinfo=true";
             string json = await _httpClient.GetStringAsync(url);
-            JsonDocument doc = JsonDocument.Parse(json);
-            foreach (JsonElement game in doc.RootElement.GetProperty("response").GetProperty("games").EnumerateArray())
+            using JsonDocument doc = JsonDocument.Parse(json);
+            if (!doc.RootElement.TryGetProperty("response", out JsonElement response))
+                return newGames;
+            if (!response.TryGetProperty("games", out JsonElement owned))
+                return newGames;
+            foreach (JsonElement game in owned.EnumerateArray())
             {
                 string gameID = game.GetProperty("appid").GetInt32().ToString();
-                if (Games.Any(g => g.ID == gameID)) continue;
-                currGames.Add(new Game
+                if (Games.Any(g => g.ID == gameID))
+                    continue;
+                newGames.Add(new Game
                 {
                     Name = game.GetProperty("name").GetString(),
                     ID = gameID,
                     ImgIconUrl = $"https://media.steampowered.com/steamcommunity/public/images/apps/{game.GetProperty("appid").GetInt32()}/{game.GetProperty("img_icon_url").GetString()}.jpg",
                 });
             }
-            Games.AddRange(currGames);
-            await LoadGameIconsAsync();
-            if (currGames.Count > 0)
-            {
-                await LoadGameAchievementsAsync();
-                await LoadAchievementDetailsAsync();
-                await LoadAchievementIconsAsync();
-                gamesToSave = Games.Where(g => g.HasAchievements && g.UnlockedAchievements < g.TotalAchievements && g.Achievements.Any(a => !a.Achieved)).Select(g => new Game { Name = g.Name, ID = g.ID, ImgIconUrl = g.ImgIconUrl, HasAchievements = g.HasAchievements, TotalAchievements = g.TotalAchievements, UnlockedAchievements = g.UnlockedAchievements, Percent = g.Percent, ImgIcon = g.ImgIcon, Achievements = g.Achievements.Where(a => !a.Achieved).ToList() }).ToList();
-                SaveData.Save(gamesToSave);
-            }
+            if (newGames.Count == 0)
+                return newGames;
+            Games.AddRange(newGames);
+            await LoadGameIconsAsync(newGames);
+            await LoadGameAchievementsAsync(newGames);
+            await LoadAchievementDetailsAsync(newGames);
+            await LoadAchievementIconsAsync(newGames);
+            return newGames;
         }
         public async Task GetGamesDataFromSteamWithoutSaving()
         {
@@ -306,11 +355,16 @@ namespace AchievementHunting
             List<BeatenGame> beatenGames = SaveData.LoadBeatenGames();
             foreach (Game game in Games)
             {
-                if (!game.HasAchievements) continue;
-                if (game.UnlockedAchievements < game.TotalAchievements) continue;
-                if (game.BeatedAt.HasValue) continue;
-                GameAchievement? lastAchievement = game.Achievements.Where(a => a.Achieved && a.AchievedAt.HasValue).OrderByDescending(a => a.AchievedAt).FirstOrDefault();
-                if (!lastAchievement?.AchievedAt.HasValue ?? true) continue;
+                if (!game.HasAchievements)
+                    continue;
+                if (game.UnlockedAchievements < game.TotalAchievements)
+                    continue;
+                if (game.BeatedAt.HasValue)
+                    continue;
+                GameAchievement? lastAchievement = game.Achievements.Where(a => a.Achieved && a.AchievedAt.HasValue)
+                                                                    .OrderByDescending(a => a.AchievedAt).FirstOrDefault();
+                if (!lastAchievement?.AchievedAt.HasValue ?? true)
+                    continue;
                 game.BeatedAt = lastAchievement.AchievedAt;
                 if (!beatenGames.Any(g => g.ID == game.ID))
                 {
@@ -321,7 +375,6 @@ namespace AchievementHunting
                     });
                 }
             }
-
             SaveData.Save(beatenGames);
         }
     }

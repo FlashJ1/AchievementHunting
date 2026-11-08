@@ -69,7 +69,7 @@
             // 
             // LBGImage
             // 
-            LBGImage.Location = new Point(12, 223);
+            LBGImage.Location = new Point(10, 223);
             LBGImage.Name = "LBGImage";
             LBGImage.Size = new Size(460, 215);
             LBGImage.SizeMode = PictureBoxSizeMode.StretchImage;
@@ -89,13 +89,15 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(484, 451);
             Controls.Add(lbLastBeatenGame);
             Controls.Add(LBGImage);
             Controls.Add(lbCountGames);
             Controls.Add(lbNickname);
             Controls.Add(bigProfileImage);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Icon = (Icon)resources.GetObject("$this.Icon");
+            MaximizeBox = false;
             Name = "Profile";
             Text = "Profile";
             Load += Profile_Load;

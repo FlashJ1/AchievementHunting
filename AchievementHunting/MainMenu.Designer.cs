@@ -40,6 +40,8 @@
             lbGamesProgress = new Label();
             btnAchieveList = new Button();
             btnRefresh = new Button();
+            btnAutoRefresh = new Button();
+            btnFriendList = new Button();
             ((System.ComponentModel.ISupportInitialize)imageHeader).BeginInit();
             ((System.ComponentModel.ISupportInitialize)profileImage).BeginInit();
             SuspendLayout();
@@ -160,12 +162,34 @@
             btnRefresh.UseVisualStyleBackColor = true;
             btnRefresh.Click += btnRefresh_Click;
             // 
+            // btnAutoRefresh
+            // 
+            btnAutoRefresh.Location = new Point(835, 39);
+            btnAutoRefresh.Name = "btnAutoRefresh";
+            btnAutoRefresh.Size = new Size(110, 23);
+            btnAutoRefresh.TabIndex = 16;
+            btnAutoRefresh.Text = "Auto Refresh: OFF";
+            btnAutoRefresh.UseVisualStyleBackColor = true;
+            btnAutoRefresh.Click += btnAutoRefresh_Click;
+            // 
+            // btnFriendList
+            // 
+            btnFriendList.Location = new Point(12, 179);
+            btnFriendList.Name = "btnFriendList";
+            btnFriendList.Size = new Size(75, 23);
+            btnFriendList.TabIndex = 17;
+            btnFriendList.Text = "Friends";
+            btnFriendList.UseVisualStyleBackColor = true;
+            btnFriendList.Click += btnFriendList_Click;
+            // 
             // MainMenu
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackgroundImage = Properties.Resources.AHBG;
             ClientSize = new Size(954, 451);
+            Controls.Add(btnFriendList);
+            Controls.Add(btnAutoRefresh);
             Controls.Add(btnRefresh);
             Controls.Add(btnAchieveList);
             Controls.Add(lbGamesProgress);
@@ -202,5 +226,7 @@
         private Label lbGamesProgress;
         private Button btnAchieveList;
         private Button btnRefresh;
+        private Button btnAutoRefresh;
+        private Button btnFriendList;
     }
 }

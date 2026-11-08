@@ -24,7 +24,12 @@ namespace AchievementHunting
         public void RefreshAchievements()
         {
             listViewAchievements.Items.Clear();
-            var achievements = game.Achievements.Where(a => !a.Achieved).OrderByDescending(a => { double.TryParse(a.GlobalPercent, out double global); return global; }).ToList();
+            var achievements = game.Achievements.Where(a => !a.Achieved)
+                                                .OrderByDescending(a =>
+                                                {
+                                                    double.TryParse(a.GlobalPercent, out double global);
+                                                    return global;
+                                                }).ToList();
             foreach (GameAchievement achievement in achievements)
             {
                 ListViewItem item = new ListViewItem(achievement.Name);

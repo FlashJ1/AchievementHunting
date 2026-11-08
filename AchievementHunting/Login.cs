@@ -21,7 +21,6 @@ namespace AchievementHunting
         public string SteamID => tbSteamID.Text.Trim();
         private GetGamesData ggd;
         private List<Game> games = new List<Game>();
-
         private MainMenu? form1;
         public Login()
         {

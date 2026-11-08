@@ -20,10 +20,8 @@ namespace AchievementHunting
         public ListGame(List<Game> games)
         {
             InitializeComponent();
-
             this.games = games;
         }
-
         private void Form2_Load(object sender, EventArgs e)
         {
             this.Text = "List Games";
@@ -35,7 +33,6 @@ namespace AchievementHunting
             listBoxGames.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
             listBoxGames.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
         }
-
         public void AddGame(Game game)
         {
             ListViewItem item = new ListViewItem(game.Name);
@@ -52,9 +49,11 @@ namespace AchievementHunting
 
         private void listBoxGames_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (listBoxGames.SelectedItems.Count == 0) return;
+            if (listBoxGames.SelectedItems.Count == 0)
+                return;
             Game? selectedGame = listBoxGames.SelectedItems[0].Tag as Game;
-            if (selectedGame == null) return;
+            if (selectedGame == null)
+                return;
             GameSelected?.Invoke(selectedGame);
         }
     }
