@@ -30,38 +30,9 @@
         {
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ListGame));
-            listBoxGames = new ListView();
-            Game = new ColumnHeader();
-            Percent = new ColumnHeader();
             imageList1 = new ImageList(components);
-            Achievements = new ColumnHeader();
+            cbOrientation = new ComboBox();
             SuspendLayout();
-            // 
-            // listBoxGames
-            // 
-            listBoxGames.Columns.AddRange(new ColumnHeader[] { Game, Percent, Achievements });
-            listBoxGames.Dock = DockStyle.Fill;
-            listBoxGames.Font = new Font("Segoe UI Semibold", 12F, FontStyle.Bold);
-            listBoxGames.FullRowSelect = true;
-            listBoxGames.Location = new Point(0, 0);
-            listBoxGames.Name = "listBoxGames";
-            listBoxGames.Size = new Size(800, 450);
-            listBoxGames.SmallImageList = imageList1;
-            listBoxGames.TabIndex = 0;
-            listBoxGames.UseCompatibleStateImageBehavior = false;
-            listBoxGames.View = View.Details;
-            listBoxGames.SelectedIndexChanged += listBoxGames_SelectedIndexChanged;
-            // 
-            // Game
-            // 
-            Game.Text = "Game";
-            Game.Width = 350;
-            // 
-            // Percent
-            // 
-            Percent.Text = "Percent";
-            Percent.TextAlign = HorizontalAlignment.Center;
-            Percent.Width = 80;
             // 
             // imageList1
             // 
@@ -69,31 +40,34 @@
             imageList1.ImageSize = new Size(16, 16);
             imageList1.TransparentColor = Color.Transparent;
             // 
-            // Achievements
+            // cbOrientation
             // 
-            Achievements.Text = "Achievements";
-            Achievements.TextAlign = HorizontalAlignment.Center;
-            Achievements.Width = 200;
+            cbOrientation.DropDownStyle = ComboBoxStyle.DropDownList;
+            cbOrientation.Font = new Font("Segoe UI Semibold", 11.25F, FontStyle.Bold, GraphicsUnit.Point, 204);
+            cbOrientation.FormattingEnabled = true;
+            cbOrientation.ImeMode = ImeMode.NoControl;
+            cbOrientation.Items.AddRange(new object[] { "Sheets", "Landscape", "Portrait" });
+            cbOrientation.Location = new Point(12, 12);
+            cbOrientation.Name = "cbOrientation";
+            cbOrientation.Size = new Size(121, 28);
+            cbOrientation.TabIndex = 1;
+            cbOrientation.SelectedIndexChanged += cbOrientation_SelectedIndexChanged;
             // 
-            // Form2
+            // ListGame
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(listBoxGames);
+            Controls.Add(cbOrientation);
             Icon = (Icon)resources.GetObject("$this.Icon");
-            Name = "Form2";
+            Name = "ListGame";
             Text = "Form2";
             Load += Form2_Load;
             ResumeLayout(false);
         }
 
         #endregion
-
-        private ListView listBoxGames;
         private ImageList imageList1;
-        private ColumnHeader Game;
-        private ColumnHeader Percent;
-        private ColumnHeader Achievements;
+        private ComboBox cbOrientation;
     }
 }
